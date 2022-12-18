@@ -4,6 +4,13 @@ variable "name_prefix" {
   nullable    = false
 }
 
+variable "kubernetes_version" {
+  description = "Kubernetes version for the EKS cluster"
+  type        = string
+  default     = 1.25
+  nullable    = false
+}
+
 variable "enable_public_access_endpoint" {
   description = "Flag to enable or disable public access endpoint"
   type        = bool

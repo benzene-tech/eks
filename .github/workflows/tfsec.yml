@@ -3,7 +3,7 @@ name: tfsec
 on:
   push:
     branches:
-      - "master"
+      - "main"
     paths-ignore:
       - ".github/**.yml"
       - "!.github/workflows/tfsec.yml"
