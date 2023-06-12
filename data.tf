@@ -1,15 +1,19 @@
+data "aws_caller_identity" "current" {}
+
 data "aws_availability_zones" "available" {
   state = "available"
 }
 
-data "aws_subnets" "private" {
+data "aws_subnets" "this" {
+  for_each = toset(["public", "private"])
+
   filter {
     name   = "vpc-id"
     values = [var.vpc_id]
   }
 
   tags = {
-    Name = "*_private"
+    Name = "*_${each.value}"
   }
 }
 

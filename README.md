@@ -6,14 +6,19 @@ Terraform module to create a EKS cluster instance.
 
 ```terraform
 module "eks" {
-  source = "github.com/benzene-tech/ec2?ref=v1.0"
+  source = "github.com/benzene-tech/eks?ref=v1.0"
 
-  name_prefix               = "example"
-  vpc_id                    = "vpc-12345"
-  node_group_scaling_config = {
-    desired_size = 1
-    max_size     = 2
-    min_size     = 1
+  name_prefix = "example"
+  vpc_id      = "vpc-12345"
+  node_groups = {
+    example = {
+      subnet_type = private
+      scaling     = {
+        desired_size = 1
+        max_size     = 2
+        min_size     = 1
+      }
+    }
   }
 }
 ```
