@@ -6,7 +6,7 @@ Terraform module to create a EKS cluster instance.
 
 ```terraform
 module "eks" {
-  source = "github.com/benzene-tech/eks?ref=v1.1.2"
+  source = "github.com/benzene-tech/terraform-aws-eks?ref=v1.1.2"
 
   name_prefix = "example"
   vpc_id      = "vpc-12345"

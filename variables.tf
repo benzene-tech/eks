@@ -6,9 +6,9 @@ variable "name_prefix" {
 
 # VPC
 variable "vpc_id" {
-  description = "VPC ID"
+  description = "VPC ID. If VPC ID is not provided default VPC will be used"
   type        = string
-  nullable    = false
+  default     = null
 }
 
 # EKS cluster
@@ -20,7 +20,7 @@ variable "kubernetes_version" {
 }
 
 variable "enable_public_access_endpoint" {
-  description = "Flag to enable or disable public access endpoint"
+  description = "Determine whether to enable or disable public access endpoint"
   type        = bool
   default     = true
   nullable    = false
@@ -32,7 +32,19 @@ variable "public_access_cidrs" {
   default     = null
 }
 
-variable "eks_cluster_iam_role_name" {
+variable "cluster_subnet" {
+  description = "Subnet type where the EKS cluster will be created"
+  type        = string
+  default     = "private"
+  nullable    = false
+
+  validation {
+    condition     = contains(["public", "private"], var.cluster_subnet)
+    error_message = "Subnet type should be either 'public' or 'private'"
+  }
+}
+
+variable "cluster_iam_role_name" {
   description = "IAM role name for EKS cluster"
   type        = string
   nullable    = false
@@ -47,12 +59,13 @@ variable "node_groups" {
       instance_types = optional(list(string), null)
       scaling = object({
         desired_size = number
-        max_size     = number
         min_size     = number
+        max_size     = number
       })
     }
   ))
-  default = {}
+  default  = {}
+  nullable = false
 
   validation {
     condition     = alltrue([for node_group in var.node_groups : contains(["public", "private"], node_group.subnet_type)])
@@ -63,8 +76,7 @@ variable "node_groups" {
 variable "node_group_iam_role_name" {
   description = "IAM role name to be used by node groups"
   type        = string
-  default     = ""
-  nullable    = false
+  default     = null
 }
 
 # Fargate
@@ -87,8 +99,7 @@ variable "fargate_profiles" {
 variable "fargate_profile_iam_role_name" {
   description = "IAM role name to be used by fargate profiles"
   type        = string
-  default     = ""
-  nullable    = false
+  default     = null
 }
 
 # AWS auth

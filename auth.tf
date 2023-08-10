@@ -1,18 +1,18 @@
 locals {
   aws_auth_config_map_data = {
-    mapRoles = yamlencode(flatten(concat(
+    mapRoles = yamlencode(concat(
       [
         {
-          rolearn  = one(data.aws_iam_role.node_group[*].arn)
           username = "system:node:{{EC2PrivateDNSName}}"
+          rolearn  = one(data.aws_iam_role.node_group[*].arn)
           groups = [
             "system:bootstrappers",
             "system:nodes"
           ]
         },
         {
-          rolearn  = one(data.aws_iam_role.fargate_profile[*].arn)
           username = "system:node:{{SessionName}}"
+          rolearn  = one(data.aws_iam_role.fargate_profile[*].arn)
           groups = [
             "system:bootstrappers",
             "system:nodes",
@@ -21,7 +21,7 @@ locals {
         }
       ],
       var.aws_auth_roles
-    )))
+    ))
   }
 }
 
