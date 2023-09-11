@@ -22,7 +22,7 @@ jobs:
       security-events: write
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Scan
         uses: aquasecurity/tfsec-sarif-action@v0.1.4
