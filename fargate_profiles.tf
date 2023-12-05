@@ -20,4 +20,6 @@ resource "aws_eks_fargate_profile" "this" {
       labels    = selector.value["labels"]
     }
   }
+
+  tags = var.tags
 }

@@ -10,6 +10,7 @@ resource "aws_eks_node_group" "this" {
   cluster_name    = aws_eks_cluster.this.name
   node_group_name = each.key
   version         = var.kubernetes_version
+  labels          = each.value.labels
   node_role_arn   = one(data.aws_iam_role.node_group[*].arn)
   subnet_ids      = data.aws_subnets.this[each.value.subnet_type].ids
   instance_types  = each.value.instance_types
@@ -19,4 +20,11 @@ resource "aws_eks_node_group" "this" {
     max_size     = each.value.scaling.max_size
     min_size     = each.value.scaling.min_size
   }
+
+  update_config {
+    max_unavailable            = each.value.update.max_unavailable_percentage == null ? coalesce(each.value.update.max_unavailable, 1) : null
+    max_unavailable_percentage = each.value.update.max_unavailable_percentage
+  }
+
+  tags = var.tags
 }

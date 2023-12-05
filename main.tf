@@ -13,6 +13,8 @@ resource "aws_eks_cluster" "this" {
     endpoint_public_access  = var.enable_public_access_endpoint
     endpoint_private_access = true
   }
+
+  tags = var.tags
 }
 
 check "cluster_subnet" {

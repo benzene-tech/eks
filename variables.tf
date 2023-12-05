@@ -15,7 +15,7 @@ variable "vpc_id" {
 variable "kubernetes_version" {
   description = "Kubernetes version for the EKS cluster"
   type        = string
-  default     = 1.27
+  default     = 1.28
   nullable    = false
 }
 
@@ -55,13 +55,18 @@ variable "node_groups" {
   description = "Node groups to be created"
   type = map(object(
     {
-      subnet_type    = string
+      subnet_type    = optional(string, "private")
       instance_types = optional(list(string), null)
+      labels         = optional(map(string), null)
       scaling = object({
         desired_size = number
         min_size     = number
         max_size     = number
       })
+      update = optional(object({
+        max_unavailable            = optional(number, null)
+        max_unavailable_percentage = optional(number, null)
+      }), {})
     }
   ))
   default  = {}
@@ -70,6 +75,11 @@ variable "node_groups" {
   validation {
     condition     = alltrue([for node_group in var.node_groups : contains(["public", "private"], node_group.subnet_type)])
     error_message = "Subnet type should be either 'public' or 'private'"
+  }
+
+  validation {
+    condition     = alltrue([for node_group in var.node_groups : (sum([for config in node_group.update : (config != null ? 1 : 0)]) <= 1)])
+    error_message = "Either 'max_unavailable' or 'max_unavailable_percentage' should be set. Both are mutually exclusive"
   }
 }
 
@@ -126,4 +136,10 @@ variable "aws_auth_roles" {
   }))
   default  = []
   nullable = false
+}
+
+variable "tags" {
+  description = "Tags to be assigned to the resources"
+  type        = map(string)
+  default     = null
 }
