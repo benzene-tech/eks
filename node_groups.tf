@@ -9,11 +9,21 @@ resource "aws_eks_node_group" "this" {
 
   cluster_name    = aws_eks_cluster.this.name
   node_group_name = each.key
-  version         = var.kubernetes_version
-  labels          = each.value.labels
+  version         = aws_eks_cluster.this.version
   node_role_arn   = one(data.aws_iam_role.node_group[*].arn)
   subnet_ids      = data.aws_subnets.this[each.value.subnet_type].ids
   instance_types  = each.value.instance_types
+  labels          = each.value.labels
+
+  dynamic "taint" {
+    for_each = each.value.taints
+
+    content {
+      key    = taint.key
+      value  = taint.value.value
+      effect = taint.value.effect
+    }
+  }
 
   scaling_config {
     desired_size = each.value.scaling.desired_size

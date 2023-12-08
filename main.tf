@@ -3,7 +3,7 @@ data "aws_iam_role" "eks_cluster" {
 }
 
 resource "aws_eks_cluster" "this" {
-  name     = var.name_prefix
+  name     = var.name
   role_arn = data.aws_iam_role.eks_cluster.arn
   version  = var.kubernetes_version
 
@@ -15,6 +15,13 @@ resource "aws_eks_cluster" "this" {
   }
 
   tags = var.tags
+
+  lifecycle {
+    precondition {
+      condition     = length(data.aws_subnets.this[var.cluster_subnet].ids) > 1
+      error_message = "Required at least two subnets of same type to create EKS cluster"
+    }
+  }
 }
 
 check "cluster_subnet" {
