@@ -54,9 +54,11 @@ variable "node_groups" {
   description = "Node groups to be created"
   type = map(object(
     {
-      subnet_type    = optional(string, "private")
+      ami_type       = optional(string, null)
       instance_types = optional(list(string), null)
+      capacity_type  = optional(string, null)
       labels         = optional(map(string), null)
+      subnet_type    = optional(string, "private")
       taints = optional(map(object({
         value  = optional(string)
         effect = string
@@ -78,6 +80,11 @@ variable "node_groups" {
   validation {
     condition     = alltrue([for node_group in var.node_groups : contains(["public", "private"], node_group.subnet_type)])
     error_message = "Subnet type should be either 'public' or 'private'"
+  }
+
+  validation {
+    condition     = alltrue([for node_group in var.node_groups : contains(["ON_DEMAND", "SPOT"], node_group.capacity_type)])
+    error_message = "Capacity type should be either 'ON_DEMAND' or 'SPOT'"
   }
 
   validation {

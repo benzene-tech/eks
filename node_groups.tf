@@ -10,10 +10,12 @@ resource "aws_eks_node_group" "this" {
   cluster_name    = aws_eks_cluster.this.name
   node_group_name = each.key
   version         = aws_eks_cluster.this.version
-  node_role_arn   = one(data.aws_iam_role.node_group[*].arn)
-  subnet_ids      = data.aws_subnets.this[each.value.subnet_type].ids
+  ami_type        = each.value.ami_type
   instance_types  = each.value.instance_types
+  capacity_type   = each.value.capacity_type
   labels          = each.value.labels
+  subnet_ids      = data.aws_subnets.this[each.value.subnet_type].ids
+  node_role_arn   = one(data.aws_iam_role.node_group[*].arn)
 
   dynamic "taint" {
     for_each = each.value.taints
