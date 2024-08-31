@@ -1,7 +1,7 @@
 data "aws_iam_role" "node_group" {
   count = length(var.node_groups) != 0 ? 1 : 0
 
-  name = var.node_group_iam_role_name
+  name = var.node_group_role
 }
 
 resource "aws_eks_node_group" "this" {

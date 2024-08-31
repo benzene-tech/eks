@@ -21,3 +21,9 @@ data "aws_subnets" "this" {
     values = [each.value == "public" ? "true" : "false"]
   }
 }
+
+data "aws_iam_role" "this" {
+  for_each = var.access_entries
+
+  name = each.key
+}
