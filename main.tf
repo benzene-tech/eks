@@ -1,10 +1,6 @@
-data "aws_iam_role" "eks_cluster" {
-  name = var.cluster_role
-}
-
 resource "aws_eks_cluster" "this" {
   name     = var.name
-  role_arn = data.aws_iam_role.eks_cluster.arn
+  role_arn = data.aws_iam_role.cluster.arn
   version  = var.kubernetes_version
 
   vpc_config {
@@ -39,7 +35,7 @@ resource "aws_eks_access_entry" "this" {
   for_each = var.access_entries
 
   cluster_name      = aws_eks_cluster.this.id
-  principal_arn     = data.aws_iam_role.this[each.key].arn
+  principal_arn     = data.aws_iam_role.access_entries[each.key].arn
   kubernetes_groups = each.value.groups
 }
 
@@ -50,7 +46,7 @@ resource "aws_eks_access_policy_association" "admin" {
   } if contains(keys(config.policies), "AmazonEKSAdminPolicy") }
 
   cluster_name  = aws_eks_cluster.this.id
-  principal_arn = data.aws_iam_role.this[each.key].arn
+  principal_arn = data.aws_iam_role.access_entries[each.key].arn
   policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminPolicy"
 
   access_scope {
@@ -68,7 +64,7 @@ resource "aws_eks_access_policy_association" "admin_view" {
   } if contains(keys(config.policies), "AmazonEKSAdminViewPolicy") }
 
   cluster_name  = aws_eks_cluster.this.id
-  principal_arn = data.aws_iam_role.this[each.key].arn
+  principal_arn = data.aws_iam_role.access_entries[each.key].arn
   policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminViewPolicy"
 
   access_scope {
@@ -86,7 +82,7 @@ resource "aws_eks_access_policy_association" "cluster_admin" {
   } if contains(keys(config.policies), "AmazonEKSClusterAdminPolicy") }
 
   cluster_name  = aws_eks_cluster.this.id
-  principal_arn = data.aws_iam_role.this[each.key].arn
+  principal_arn = data.aws_iam_role.access_entries[each.key].arn
   policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
 
   access_scope {
@@ -104,7 +100,7 @@ resource "aws_eks_access_policy_association" "edit" {
   } if contains(keys(config.policies), "AmazonEKSEditPolicy") }
 
   cluster_name  = aws_eks_cluster.this.id
-  principal_arn = data.aws_iam_role.this[each.key].arn
+  principal_arn = data.aws_iam_role.access_entries[each.key].arn
   policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSEditPolicy"
 
   access_scope {
@@ -122,7 +118,7 @@ resource "aws_eks_access_policy_association" "view" {
   } if contains(keys(config.policies), "AmazonEKSViewPolicy") }
 
   cluster_name  = aws_eks_cluster.this.id
-  principal_arn = data.aws_iam_role.this[each.key].arn
+  principal_arn = data.aws_iam_role.access_entries[each.key].arn
   policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSViewPolicy"
 
   access_scope {

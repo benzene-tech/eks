@@ -22,7 +22,37 @@ data "aws_subnets" "this" {
   }
 }
 
-data "aws_iam_role" "this" {
+data "aws_iam_role" "cluster" {
+  name = var.cluster_role
+}
+
+data "aws_iam_role" "node_group" {
+  count = length(var.node_groups) != 0 ? 1 : 0
+
+  name = var.node_group_role
+
+  lifecycle {
+    precondition {
+      condition     = var.node_group_role != null
+      error_message = "'node_group_role' variable is required to create Node groups"
+    }
+  }
+}
+
+data "aws_iam_role" "fargate_profile" {
+  count = length(var.fargate_profiles) != 0 ? 1 : 0
+
+  name = var.fargate_profile_pod_execution_role
+
+  lifecycle {
+    precondition {
+      condition     = var.fargate_profile_pod_execution_role != null
+      error_message = "'fargate_profile_pod_execution_role' variable is required to create Fargate profiles"
+    }
+  }
+}
+
+data "aws_iam_role" "access_entries" {
   for_each = var.access_entries
 
   name = each.key
