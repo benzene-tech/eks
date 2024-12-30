@@ -1,9 +1,3 @@
-data "aws_iam_role" "fargate_profile" {
-  count = length(var.fargate_profiles) != 0 ? 1 : 0
-
-  name = var.fargate_profile_iam_role_name
-}
-
 resource "aws_eks_fargate_profile" "this" {
   for_each = var.fargate_profiles
 
